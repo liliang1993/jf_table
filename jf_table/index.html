@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>jf</title>
+		<link rel="stylesheet" href="./css/public.css">
+	<link rel="stylesheet" href="./css/index.css">
+	<script src='./lib/jq/jquery-1.8.3.min.js'></script>
+	<script src='lib/template.js'></script>
+	<script src='lib/jquery.websocket.js'></script>
+	<script src='./js/datagrid.js'></script>
+</head>
+<body>
+		<script id="tpl" type="text/template">
+										<tr class='main-row' data-symbol=<%:=result[0].symbol%> >
+											<td width='60px' align='center'>
+												<i class='icon icon-chkbox'></i>
+											</td>
+											<td width="207px"  >
+													<i class='icon icon-dropdown mr10'></i><%:=result[0].symbol%>
+											</td>
+											<td width='140px' align='center'>
+													<%:=result[0].bid_size%>
+											</td>
+											<td width='230px' align='center' data-bid =<%:=result[0].symbol%> >
+												<%:=result[0].bid_price%>
+												<i class='bid icon icon-arrow'></i>
+											</td>
+											<td width='180px' align='center'><%:=result[0].spread%></td>
+											<td width='230px' align='center' data-ofr=<%:=result[0].symbol%> >
+													<%:=result[0].ofr_price%>
+													<i class="ask icon icon-arrow"></i>
+											</td>
+											<td width='140px' align='center'>
+													<%:=result[0].ofr_size%>
+											</td>
+										</tr>	
+										<%for(var i = 1; i < result.length; i++) {%>
+											<tr class='hidden-row dn' data-symbol=<%:=result[0].symbol%> >
+												<td width='60px' align='center'>								
+												</td>
+												<td width="217px" >
+												</td>
+												<td width='140px' align='center'>
+														<%:=result[i].bid_size%>
+												</td>
+												<td width='230px' align='center'>
+													<%:=result[i].bid_price%>
+												</td>
+												<td width='180px' align='center'>
+												<%:=result[i].spread%>		
+												</td>
+												<td width='230px' align='center'>
+														<%:=result[i].ofr_size%>
+												</td>
+												<td width='140px' align='center'>
+														<%:=result[i].ofr_price%>
+												</td>
+											</tr>
+												<%}%>
+		</script>
+		<script id="search" type="text/template">
+				<ul>
+							<%for(var i = 0; i < result.length; i++) {%>
+												<li class='about-item'><%:=result[i]%></li>				
+										<%}%>
+				</ul>									
+		</script>																			
+	<div class="m-header">
+			<div class="w1200 h70 clearfix">
+					<h1 class='logo fl'>
+						<a href="">
+							<img width='192' height='48' src="images/logo.png" alt="晋峰环球">
+						</a>
+					</h1>
+					<div class='fr header-r clearfix'>
+							<div class="h-connected mr70 fl">
+								 <img src="images/signal.gif" alt="" class='mr3'>
+								Connected
+							</div>
+							<div class="skin fr">
+									<a href="" class='change-skin-btn dark db fl mr11'>DARK</a>
+									<a href="" class='change-skin-btn light db fr'>LIGHT</a>
+							</div>
+					</div>
+			</div>
+	</div>
+	<div class="table-header">
+				<div class="w1200">
+					<ul class='clearfix'>
+						<li class='fl w210 pl90 pr search_li'>Symbol
+									<input type='search' class='symbol-search'placeholder='Symbol'>
+								<i class='icon-symbol-search'></i>	
+								<div class="about-box"></div>
+						</li>
+						<li class='fl w140 tc'>Bid Size</li>
+						<li class='fl w220 tc'>Bid Price</li>
+						<li class='fl w180 tc'>Spread</li>
+						<li class='fl w220 tc'>Ask Price</li>
+						<li class='fl w140 tc'>Ask Size</li>
+					</ul>
+				</div>						
+	</div>
+	<div class="content w1200">
+			<table>
+			<tbody>
+				
+			</tbody>
+		</table>
+	</div>	
+	<!-- 悬浮框批量选择 -->
+<!-- 	<div class="selected-box dn">
+			<div class="deleteAll">
+				全部删除 <i class="icon icon-delete"></i>
+			</div>
+			<div class="selected-list">
+					<ul>
+						<li>XSSUD1<i class="icon icon-delete "></i></li>
+						<li>XSSUD2<i class="icon icon-delete "></i></li>
+						<li>XSSUD3<i class="icon icon-delete "></i></li>
+						<li>XSSUD4<i class="icon icon-delete "></i></li>
+					</ul>
+			</div>
+			<div class="box-bottom">
+					<a href="" class='look-for-btn db tc'>
+						查看更多
+					</a>
+			</div>
+	</div> -->
+	<!-- 侧栏式批量选择 -->
+	<div class="slide-bar dn clearfix">
+			<div class="slide-bar-l fl">
+				<div class="slide-bar-l-content">
+						<i class='icon icon-search'></i>
+						加<br>入<br>搜<br>索
+				</div>
+			</div>
+			<div class="slide-bar-r fl">
+					<div class="header">
+						<div class="deleteAll">
+								全部删除
+							<i class="icon-delete"></i>
+						</div>
+					</div>
+					<div class="select-list">
+							<ul class='select-list-container'>
+									
+									<!-- <li>
+											<i class="icon icon-check-box"></i>
+											<span class="select-symbol">USDZAR</span>
+											<i class='icon-delete'></i>
+									</li> -->
+							</ul>
+					</div>
+					<div class="select-search ">
+							<a href="" class="search-btn tc">
+								立即查看
+							</a>
+					</div>
+			</div>
+	</div>
+	<script>
+		$(function(){
+  			var tpl = $('#tpl').html();
+  			var selected_length = 0;
+  			var selected_symbols = [];
+				var symbol_dict = {};
+				var first_selected_flag = true;
+				function table_checkbox_handle(){
+					$(document).on("click", "table .icon-chkbox", function(){
+							$(this).toggleClass('checked');
+							var select_symbol = $.trim( $(this).parent().next().text() );
+							if(!$(this).hasClass('checked')){	
+									$('.select-list-container li').each(function(index){
+											var _text = $.trim($(this).text());
+											if(_text == select_symbol){
+													$('.select-list-container li').eq(index).remove();
+											}
+									});
+							}else{
+									var html = '<li>'+select_symbol+'<i class="icon-delete "></i></li>';
+									$('.select-list-container').append(html);
+							}				
+							selected_length = $('.icon-chkbox.checked').length;
+							if(selected_length !== 0){
+								$('.slide-bar').show();
+								$('.slide-bar-r').animate({width: '178px'});
+
+							}else{
+
+									$('.slide-bar-r').animate({width:'0px'},'500','linear',function(){
+										$('.slide-bar').hide();
+									});
+							};
+						});
+				};
+				function dropdown_handle(){
+					$(document).on("click", ".icon-dropdown", function () {
+									var attr = $(this).parent().parent().attr('data-symbol');
+									$(this).toggleClass('downed');
+									$('.hidden-row[data-symbol='+attr+']').toggle();
+
+				    })
+		
+				};
+				function slide_bar_show(){
+							$('.slide-bar-l').click(function(){
+								var _content = $('.slide-bar-r');
+								var _width = _content.css('width');
+								console.log('_width',_width);	
+								if(_width=='0px'){
+									_content.animate({width:'178px'});
+								}else if(_width >= '178px'){
+									console.log('_width',_width);	
+									_content.animate({width:'0px'});
+								}
+							})
+				}
+				function slide_deleteAll(){
+						$(document).on("click", ".deleteAll  i.icon-delete", function () {
+									$('.select-list ul').empty();
+									console.log('1231245',$('table .icon-checked.checked'));
+									$('table .icon-chkbox.checked').removeClass('checked');
+				    })
+				}
+				function slide_list_select(){
+						 $(document).on('click','.select-list i.icon-delete',function(){
+							 				var text =$(this).parent().text();
+							 				var table_symbol;
+							 						$('table .icon-chkbox.checked').each(function(index){
+							 							table_symbol = $.trim($(this).parent().next().text());
+							 							console.log('text',text,table_symbol);
+							 							if(table_symbol == text){
+							 									$(this).removeClass('checked');
+							 							}
+							 						});
+							 				});
+				}
+				function change_bgcolor(){
+						$("table tr.main-row:odd").css("background-color", "#2c2c33");
+				}
+				function render_symbolTable(data){
+						var i,len;
+						var symbol = data.symbol;
+						var flag = false;
+						if(symbol in symbol_dict){
+								update_symbolTable(data);
+						}else{
+								first_render_symbol(data);
+						}
+				};
+				function update_symbolTable(data){
+					var i,len1;
+					var symbol_trs =  $('[data-symbol='+data.symbol+']');
+						for(i = 0,len = 1; i<len; i++){
+									var bid_size = data.bid[i].size;
+									var bid_price = data.bid[i].price.toFixed(data.digits);
+									var spread = Math.abs(data.ofr[i].price - data.bid[i].price).toFixed(data.digits);
+									var ofr_size = data.ofr[i].size;
+									
+									var ofr_price = data.ofr[i].price.toFixed(data.digits);
+									var attrs =[bid_size,bid_price,spread,ofr_price,ofr_size];
+									attrs.forEach(function(item,index){
+											symbol_trs.eq(i).children().eq(2+index).text(item);
+									})
+									if(i == 0){
+										var pre_bid_price =	symbol_dict[data.symbol][0].bid_price;
+										var pre_ofr_price =	symbol_dict[data.symbol][0].ofr_price;
+										if(pre_bid_price > bid_price){
+
+												$('[data-bid='+data.symbol+'] .icon-arrow').removeClass('up').addClass('down');
+										}else{
+												$('[data-bid='+data.symbol+'] .icon-arrow').removeClass('down').addClass('up');
+										}
+									}
+						}
+						// var pre_bid_price =  
+				};
+				function first_render_symbol(data){
+					var i,len;
+						for(i = 0,len=data.ofr.length;i<len;i++){
+									var symbol = data.symbol;
+									console.log('symbol',symbol);
+									var bid_size = data.bid[i].size;
+									var bid_price = data.bid[i].price.toFixed(data.digits);
+									var spread = Math.abs(data.ofr[i].price - data.bid[i].price).toFixed(data.digits);
+									var ofr_size = data.ofr[i].size;
+									var ofr_price = data.ofr[i].price;
+									symbol_dict[data.symbol] = [];
+									var attrs ={
+										symbol: symbol,
+										bid_size : bid_size,
+										bid_price: bid_price,
+										spread: spread,
+										ofr_price:ofr_price,
+										ofr_size: ofr_size
+									} 
+									symbol_dict[data.symbol].push(attrs);
+						};
+							var html = template(tpl,{result: symbol_dict[data.symbol]});
+							// console.log('html',html)
+							$('.content table tbody').append(html);
+				};
+				function set_websocket(){
+						var ws = $.websocket("ws://52.196.29.119/ws/bang_quote?source=risehills&target=book", {
+						    open: function() {},
+						    close: function() {},
+						    message: function(e){
+						    	// console.log('webscoket',JSON.parse(e.originalEvent.data));
+						    	var data = JSON.parse(e.originalEvent.data);
+						    	render_symbolTable(data);
+						    }
+						});
+				}
+				function fuzzy_search(){
+					$(document).keyup(function(){
+						var _input = $('symbol-search');
+						var about_list = []; 
+						var flag = false;
+						if(_input.focus()){
+							var value = $('.symbol-search').val();
+							if(value != ""){
+									for(var k in symbol_dict){
+									console.log(k,value,k.indexOf(value));
+											if($.trim(k).indexOf(value)!== -1){
+													console.log(k);
+													about_list.push(k);
+													flag = true;
+											}
+									}
+									console.log('flag',flag);
+									if(!flag){
+											about_list = [];
+									}
+							}		
+							var tpl = $('#search').html();
+							var html = template(tpl,{result:about_list});
+							console.log('html',html,about_list,value != undefined);
+							$('.search_li .about-box').empty().append(html);
+						}
+
+					})
+				}
+				 change_bgcolor();
+				 dropdown_handle();
+				 table_checkbox_handle();
+				 slide_bar_show();
+				 slide_deleteAll();
+				 slide_list_select();
+				 set_websocket();
+				  fuzzy_search();
+		  // 	$("#dg").grid({
+			 //   id:"dg",
+			 //   data:data,
+			 //   columns: [
+			 //       {field:'ck',checkbox:true},
+			 //       { field: 'ID', title: '编号',width:400, align: 'left'},
+			 //       { field: 'name', title: '名称', width: 300, align: 'left' },
+			 //       { field: 'descrtion', title: '描述', width: 350, align: 'left' },
+			 //       { field: 'Price', title: '价格', width: 100, align: 'left' }
+			 //      ],
+			 //   isoddcolor:true
+		  // });
+		})
+	</script>
+</body>
+</html>
