@@ -3,6 +3,9 @@
 	height: 70px;
 	background-color: #1e1d25;
 	width: 100%;
+	position: fixed;
+	top:0;
+	z-index:888;
 }
 .icon{
 	background: url('../images/ico.png'),no-repeat;
@@ -22,6 +25,12 @@
 .mr70{
 	margin-right:70px;
 }
+.mt20{
+	margin-top: 20px;
+}
+.mt120{
+	margin-top: 120px;
+}
 .pl90{
 	padding-left:90px; 
 }
@@ -31,20 +40,41 @@
 .pl42{
 	padding-left: 42px;
 }
+.pl102{
+	padding-left: 102px;
+}
+.pl65{
+	padding-left: 65px;
+}
+.pl20{
+	padding-left: 20px;
+}
+.pl20{
+	padding-left: 20px;
+}
+.pr10{
+	padding-right: 10px;
+}
 .w60{
 	width: 60px;
 }
 .w210{
 	width:210px;	
 }
-.w140{
-	width: 140px;
+.w228{
+	width: 228px;
 }
-.w220{
-	width: 220px;
+.w100{
+	width:100px;
 }
-.w180{
-	width:180px;
+.w290{
+	width: 290px;
+}
+.w66{
+	width:66px;
+}
+.w212{
+	width:212px;
 }
 .logo{
 	margin-top:13px;		
@@ -76,6 +106,10 @@
 	height: 40px;
 	background: url(../images/tableBg01.gif) repeat-x;
 	padding-top: 10px;
+	position: fixed;
+	top:70px;
+	width: 100%;
+	z-index:999;
 }
 .table-header ul li{
 		line-height: 40px;
@@ -83,6 +117,9 @@
 		color:#28282d;
 		font-size: 16px;
 }
+/*.content{
+	z-index: 1
+}*/
 table {
  border-collapse: collapse;
  border-spacing: 0;
@@ -148,43 +185,6 @@ i.icon-chkbox.checked{
  background-color: #EAF2FF;
  color: #000;
 }
-/*悬浮框样式*/
-/*.selected-box{
-	height:546px;
-	width: 245px;
-	background-color: #fff;
-	position: fixed;
-	top:284px;
-	right:67px;
-	
-}
-.deleteAll{
-	height:38px;
-	background-color: #d8d8d8;
-	color:#666;
-	font-size:14px;
-	padding:0 33px;
-	line-height: 38px;
-	position: relative;
-}
- i.icon{
-		display: inline-block;
-		cursor: pointer;
-		vertical-align: middle;
-}
-.deleteAll i.icon{	
-		position: absolute;	
-		width: 16px;
-		height:16px;
-		top:13px;
-		right:33px;
-}
-.selected-box i.icon-delete:hover{
-		background-position: -28px -146px;
-}
-i.icon-delete{
-		background-position: 0 -146px;
-}*/
 
 /*侧拉框*/
 .slide-bar{
@@ -295,7 +295,9 @@ i.icon-delete{
 
 
 i.icon-dropdown{
-	display: inline-block;
+	position: absolute;
+	top:12px;
+	left:10px;
 	vertical-align: middle;
 	cursor: pointer;
 	background-origin:content-box;
@@ -324,12 +326,14 @@ i.icon-arrow{
 	display: inline-block;
 		height: 20px;
 		width: 5px;
-		margin-top:-5px;
+		margin-bottom:-2px;
 }
 i.icon-arrow.up{
+	background: url('../images/ico.png'),no-repeat;
 	background-position:0 -175px; 
 }
 i.icon-arrow.down{
+	background: url('../images/ico.png'),no-repeat;
 	background-position:-28px -175px; 
 }
 .selected-list{
@@ -441,16 +445,17 @@ input[type=search] {
  }
  .about-box{
  		position: absolute;
- 		bottom:-80px;
+ 		top:34px;
  		right:25px;
  		width: 100px;
  }
- .about-item{
- 		height:40px;
- 		line-height: 40px;
+.about-box .about-item{
+ 		height:36px;
+ 		line-height: 36px;
 		font-size: 14px;
-		background-color: #666;
+		background-color: #61616a;
+		cursor: pointer;
 		color:#fff;
 		text-align: center;
-		border-bottom: 1px solid #ccc 
+		/*border-bottom: 1px solid #ccc */
 	}

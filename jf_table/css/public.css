@@ -67,6 +67,9 @@ a{
 .tc{
   text-align: center;
 }
+.tr{
+  text-align: right;
+}
 /*中心区域*/
 .w1200{
   width:1200px;
