@@ -8,7 +8,6 @@
 	<script src='./lib/jq/jquery-1.8.3.min.js'></script>
 	<script src='lib/template.js'></script>
 	<script src='lib/jquery.websocket.js'></script>
-	<script src='./js/datagrid.js'></script>
 </head>
 <body>
 		<script id="tpl" type="text/template">
@@ -27,7 +26,9 @@
 												<span><%:=result[0].bid_price%></span>
 												<i class='icon-arrow'></i>
 											</td>
-											<td width='180px' align='center'><%:=result[0].spread%></td>
+											<td width='180px' align='center'>
+											<span><%:=result[0].spread%></span>
+											</td>
 											<td width='60px' align='right'  data-ofr=<%:=result[0].symbol%> >
 													<span><%:=result[0].ofr_price%></span>
 													<i class="icon-arrow"></i>
@@ -151,7 +152,7 @@
   			var selected_symbols = [];
 				var symbol_dict = {};
 				var search_list =[];
-				var first_selected_flag = true;
+				var filterFlag = false;
 				var _input = $('.symbol-search');
 				var _about_list = $('.search_li .about-box');
 				var search_btn = $('.icon-symbol-search');
@@ -278,15 +279,18 @@
 									var symbol = data.symbol;
 									var bid_size = data.bid[i].size;
 									var bid_price = data.bid[i].price.toFixed(data.digits);
-									var spread = Math.abs(data.ofr[i].price - data.bid[i].price).toFixed(data.digits);
+									var small_spread = Math.abs(data.ofr[i].price - data.bid[i].price).toFixed(data.digits);
+									var spread =(small_spread*Math.pow(10,data.digits)).toFixed(0);
 									var ofr_size = data.ofr[i].size;		
 									var ofr_price = data.ofr[i].price.toFixed(data.digits);
 									var attrs =[bid_size,bid_price,spread,ofr_price,ofr_size];
 									if(i == 0){
 										var pre_bid_price =	symbol_dict[data.symbol][0].bid_price;
 										var pre_ofr_price =	symbol_dict[data.symbol][0].ofr_price;
+
+										// console.log('bid_price',bid_price);
 										attrs.forEach(function(item,index){												
-												symbol_spans.text(item);
+												symbol_spans.eq(1+index).text(item);
 										});
 										if(pre_bid_price > bid_price){
 
@@ -330,11 +334,12 @@
 						};
 						for(i = 0;i<len;i++){
 									var symbol = data.symbol;
-									console.log('symbol',data,i);
+									// console.log('symbol',data,i);
 									var bid_size = data.bid[i].size;
-									console.log('bid_size',bid_size);
+									// console.log('bid_size',bid_size);
 									var bid_price = data.bid[i].price.toFixed(data.digits);
-									var spread = Math.abs(data.ofr[i].price - data.bid[i].price).toFixed(data.digits);
+									var small_spread = Math.abs(data.ofr[i].price - data.bid[i].price).toFixed(data.digits);
+									var spread = small_spread*Math.pow(10,data.digits);
 									var ofr_size = data.ofr[i].size;
 									var ofr_price = data.ofr[i].price.toFixed(data.digits);
 									symbol_dict[data.symbol] = [];
@@ -352,6 +357,11 @@
 							var html = template(tpl,{result: symbol_dict[data.symbol]});
 							// console.log('html',html)
 							$('.content table tbody').append(html);
+							console.log('false',filterFlag);
+							if(filterFlag){
+									console.log('false',data.symbol);
+									$('.main-row[data-symbol='+data.symbol+']').hide();
+							}
 							change_bgcolor();
 				};
 				function set_websocket(){
@@ -361,22 +371,27 @@
 						    },
 						    close: function() {},
 						    message: function(e){
-						    	// console.log('webscoket',JSON.parse(e.originalEvent.data));
+						    	console.log('webscoket',JSON.parse(e.originalEvent.data));
 						    	var data = JSON.parse(e.originalEvent.data);
 						    	render_symbolTable(data);
 						    }
 						});
 				};
 				function update_search_symbolTable(symbol_list){
-					if(symbol_list.length == 0){
+								if(symbol_list.length <= 0){
 									return;
-								};
-								console.log('search-list1',symbol_list);
-								$('.main-row').show();
+								}
+								filterFlag = true;
+								console.log('12345');
 								$('.main-row').each(function(){
 										var symbol =$(this).attr('data-symbol');
+										// console.log('symbol',symbol);
+										$('[data-symbol='+symbol+'] .icon-dropdown.downed').trigger('click');
+										$('[data-symbol='+symbol+'] .icon-chkbox.checked').trigger('click');
 										if($.inArray(symbol,symbol_list)==-1){
-												$('[data-symbol='+symbol+']').hide();
+												$('.main-row[data-symbol='+symbol+']').hide();
+										}else{
+												$('.main-row[data-symbol='+symbol+']').show();
 										}
 								});
 				}
@@ -385,20 +400,26 @@
 					$(document).keyup(function(){
 						if(_input.focus()){
 							search_list_handle();
-							console.log('search-list',search_list);
 						}		
 					});
 					search_btn.click(function(){
+								if(search_list.length == 0){
+									$('.main-row').show();
+										filterFlag = false;
+									$('.main-row .icon-chkbox.checked').trigger('click');
+									$('.main-row .icon-dropdown.downed').trigger('click');
+										return;						
+								};
 								update_search_symbolTable(search_list);
 					});
 					$(document).on('click','.about-item',function(){
-								console.log('about-list',$(this).text());
 										_input.val($(this).text());
 										_about_list.empty();
 										search_list = [$(this).text()];
 										update_search_symbolTable(search_list);
 					})
 				}
+
 				function slide_search_selected(){
 						slide_lookSelected_btn.click(function(event){
 									event.preventDefault();
@@ -406,13 +427,14 @@
 									$('.select-list li').each(function(){
 											select_list.push($(this).text());
 									});
-									console.log('select-list',select_list);
 									 update_search_symbolTable(select_list);
 						});
 						slide_lookAll_btn.click(function(event){
 									event.preventDefault();
+									filterFlag = false;
 									$('.main-row').show();
 									$('.main-row .icon-chkbox.checked').trigger('click');
+									$('.main-row .icon-dropdown.downed').trigger('click');
 						})
 
 				}
