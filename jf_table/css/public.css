@@ -15,7 +15,7 @@ ul,ol,dl,li{
   padding-left:0; 
   list-style-type:none;
 }
-td{
+td,td,th{
   padding:0px;
 }
 /*image with no-border*/

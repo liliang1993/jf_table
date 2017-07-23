@@ -12,56 +12,60 @@
 <body>
 		<script id="tpl" type="text/template">
 										<tr class='main-row' data-symbol=<%:=result[0].symbol%> >
-											<td width='20px' align='right'>
+											<td style='width:30px;' align='right'>
 												<i class='icon icon-chkbox'></i>
 											</td>
-											<td width="70px" align='center' class='pr pl20'>
-													<i class='icon icon-dropdown '></i>
-													<span><%:=result[0].symbol%></span>
+											<td style='width:40px;' align='center' >
+													<i class='icon icon-dropdown'></i>
 											</td>
-											<td  align='center' class='w100 pl65'>
+											<td  class='symbol_td' style='width:210px;' align='left'>
+														<span><%:=result[0].symbol%></span>
+												</td>
+											<td  width='20%' align='center'>
 													<span><%:=result[0].bid_size%></span>
 											</td>
-											<td width='80px' align='right'  data-bid =<%:=result[0].symbol%> >
+											<td width='20%' align='right'  data-bid =<%:=result[0].symbol%> >
 												<span><%:=result[0].bid_price%></span>
 												<i class='icon-arrow'></i>
 											</td>
-											<td width='180px' align='center'>
+											<td width='20%' align='right'>
 											<span><%:=result[0].spread%></span>
 											</td>
-											<td width='60px' align='right'  data-ofr=<%:=result[0].symbol%> >
+											<td width='20%' align='right'  data-ofr=<%:=result[0].symbol%> >
 													<span><%:=result[0].ofr_price%></span>
 													<i class="icon-arrow"></i>
 											</td>
-											<td width='140px' align='center'>
+											<td width='20%' align='center'>
 													<span><%:=result[0].ofr_size%></span>
 											</td>
 										</tr>	
-											
 		</script>
 		<script id="dropdown" type="text/template">
 							<%for(var i = 0; i < result.length; i++) {%>
-											<tr class='dropdown-symbol dn' data-symbol=<%:=result[0][5]%> >
-												<td width='20px' align='right'>							
+											<tr class='dropdown-symbol dn' data-symbol=<%:=result[0].symbol%> >
+												<td  style='width:30px;' align='right'>							
 												</td>
-												<td width="70px" align='center' class='pr pl20'>
+												<td style='width:40px;' align='center'>
 												</td>
-												<td  align='center' class='w100 pl65'>
-														<span><%:=result[i][0]%></span>
+												<td  style='width:210px;' align='left'>
+														<span></span>
 												</td>
-												<td width='80px' align='right' >
-													<span><%:=result[i][1]%></span>
+												<td width='20%' align='center' >
+													<span><%:=result[i].bid_size%></span>
+												</td>
+												<td width='20%' align='right' >
+													<span><%:=result[i].bid_price%></span>
 													<i class='icon-arrow'></i>
 												</td>
-												<td width='180px' align='center'>
-												<span><%:=result[i][2]%></span>		
+												<td width='20%' align='right'>
+												<span><%:=result[i].spread%></span>		
 												</td>
-												<td width='60px' align='right' >
-														<span><%:=result[i][3]%></span>
+												<td width='20%' align='right' >
+														<span><%:=result[i].ofr_size%></span>
 														<i class='icon-arrow'></i>
 												</td>
-												<td width='140px' align='center'>
-														<span><%:=result[i][4]%></span>
+												<td width='20%' align='center'>
+														<span><%:=result[i].ofr_price%></span>
 												</td>
 											</tr>
 										<%}%>
@@ -74,7 +78,7 @@
 				</ul>									
 		</script>																			
 	<div class="m-header">
-			<div class="w1200 h70 clearfix">
+			<div class="m-header-c h70 clearfix">
 					<h1 class='logo fl'>
 						<a href="">
 							<img width='192' height='48' src="images/logo.png" alt="晋峰环球">
@@ -93,8 +97,8 @@
 			</div>
 	</div>
 	<div class="table-header">
-				<div class="w1200">
-					<ul class='clearfix'>
+				<div class="table-header-c">
+					<!-- <ul class='clearfix'>
 						<li class='fl w210 pl90 pr search_li'>Symbol
 									<input type='search' class='symbol-search'placeholder='Symbol'>
 								<i class='icon-symbol-search'></i>	
@@ -105,13 +109,31 @@
 						<li class='fl w66 tc'>Spread</li>
 						<li class='fl w212 tr'>Ask Price</li>
 						<li class='fl w228 tc'>Ask Size</li>
-					</ul>
+					</ul> -->
+					<table>
+						<thead>
+								<tr>
+									<th style='width:30px;'></th>
+									<th style='width:40px;'></th>
+									<th class='pr'  style='width:210px;' align='left'>Symbol
+									<input type='search' id='symbol_search' placeholder='Symbol'>
+									<i class='icon-symbol-search'></i>	
+									<div class="about-box"></div>
+								</th>
+									<th width="20%">Bid Size</th>
+									<th width="20%" align='right'>Bid Price</th>
+									<th width="20%" align='right'>Spread</th>
+									<th width="20%"align='right'>Ask Price</th>
+									<th  width="20%">Ask Size</th>
+								</tr>
+						</thead>
+					</table>
 				</div>						
 	</div>
-	<div class="content pr  mt120 w1200">
+	<div class="content pr mt120 ">
 			<table>
 			<tbody>
-				
+							
 			</tbody>
 		</table>
 	</div>	
@@ -153,15 +175,16 @@
 				var symbol_dict = {};
 				var search_list =[];
 				var filterFlag = false;
-				var _input = $('.symbol-search');
-				var _about_list = $('.search_li .about-box');
+				var _input = $('#symbol_search');
+				var _about_list = $('.about-box');
 				var search_btn = $('.icon-symbol-search');
 				var slide_lookSelected_btn = $('.lookSelected');
 				var slide_lookAll_btn = $('.lookAll');
+ 
 				function table_checkbox_handle(){
 					$(document).on("click", "table .icon-chkbox", function(){
 							$(this).toggleClass('checked');
-							var select_symbol = $.trim( $(this).parent().next().text() );
+							var select_symbol = $.trim( $(this).parent().parent().find('.symbol_td').text() );
 							if(!$(this).hasClass('checked')){	
 									$('.select-list-container li').each(function(index){
 											var _text = $.trim($(this).text());
@@ -205,6 +228,7 @@
 										}
 									}
 							}		
+
 							var tpl = $('#search').html();
 							var html = template(tpl,{result:search_list});
 							_about_list.empty().append(html);
@@ -224,11 +248,9 @@
 							$('.slide-bar-l').click(function(){
 								var _content = $('.slide-bar-r');
 								var _width = _content.css('width');
-								console.log('_width',_width);	
 								if(_width=='0px'){
 									_content.animate({width:'178px'});
 								}else if(_width >= '178px'){
-									console.log('_width',_width);	
 									_content.animate({width:'0px'});
 								}
 							})
@@ -245,7 +267,7 @@
 							 				var _parent = $(this).parent();
 							 				var table_symbol;
 							 						$('table .icon-chkbox.checked').each(function(index){
-							 							table_symbol = $.trim($(this).parent().next().text());
+							 							table_symbol = $.trim($(this).parent().parent().find('.symbol_td').text());
 							 							if(table_symbol == text){
 							 									$(this).removeClass('checked');
 							 									_parent.remove();
@@ -271,6 +293,7 @@
 					var dropdown_dict = []; 
 					var symbol_trs =  $('.main-row[data-symbol='+data.symbol+']');
 					var symbol_spans =  $('.main-row[data-symbol='+data.symbol+'] td span');
+					var keys = [bid_size,bid_price,spread,ofr_size,ofr_price];
 						len = Math.min(data.ofr.length,data.bid.length);
 						if (len>=5){
 							len ==5;
@@ -283,14 +306,19 @@
 									var spread =(small_spread*Math.pow(10,data.digits)).toFixed(0);
 									var ofr_size = data.ofr[i].size;		
 									var ofr_price = data.ofr[i].price.toFixed(data.digits);
-									var attrs =[bid_size,bid_price,spread,ofr_price,ofr_size];
+									var attrs ={
+										symbol:symbol,
+										bid_size: bid_size,
+										bid_price: bid_price,
+										spread: spread,
+										ofr_size: ofr_size,
+										ofr_price: ofr_price
+									};
 									if(i == 0){
 										var pre_bid_price =	symbol_dict[data.symbol][0].bid_price;
 										var pre_ofr_price =	symbol_dict[data.symbol][0].ofr_price;
-
-										// console.log('bid_price',bid_price);
-										attrs.forEach(function(item,index){												
-												symbol_spans.eq(1+index).text(item);
+										keys.forEach(function(item,index){												
+												symbol_spans.eq(1+index).text(attrs[item]);
 										});
 										if(pre_bid_price > bid_price){
 
@@ -303,16 +331,9 @@
 										}else if(pre_ofr_price < ofr_price){
 												$('[data-ofr='+data.symbol+'] .icon-arrow').removeClass('down').addClass('up');
 										}
-										symbol_dict[data.symbol][0] = {
-												symbol: symbol,
-												bid_size : bid_size,
-												bid_price: bid_price,
-												spread: spread,
-												ofr_price:ofr_price,
-												ofr_size: ofr_size
-										};
+										symbol_dict[data.symbol][0] =attrs
 									}else{
-											dropdown_dict.push([bid_size,bid_price,spread,ofr_price,ofr_size,symbol]);
+											dropdown_dict.push(attrs);
 									}
 						}
 									var tpl =$('#dropdown').html();
@@ -327,22 +348,21 @@
 									} 
 				};
 				function first_render_symbol(data){
-						var i,len;
+						var i,len,dropdown_dict;
+						dropdown_dict = [];
 						len = Math.min(data.ofr.length,data.bid.length);
 						if (len>=5){
 							len ==5;
 						};
+						symbol_dict[data.symbol] = [];
 						for(i = 0;i<len;i++){
 									var symbol = data.symbol;
-									// console.log('symbol',data,i);
 									var bid_size = data.bid[i].size;
-									// console.log('bid_size',bid_size);
 									var bid_price = data.bid[i].price.toFixed(data.digits);
 									var small_spread = Math.abs(data.ofr[i].price - data.bid[i].price).toFixed(data.digits);
 									var spread = small_spread*Math.pow(10,data.digits);
 									var ofr_size = data.ofr[i].size;
-									var ofr_price = data.ofr[i].price.toFixed(data.digits);
-									symbol_dict[data.symbol] = [];
+									var ofr_price = data.ofr[i].price.toFixed(data.digits);							
 									var attrs ={
 										symbol: symbol,
 										bid_size : bid_size,
@@ -350,30 +370,57 @@
 										spread: spread,
 										ofr_price:ofr_price,
 										ofr_size: ofr_size
-									} 
+									};
 									symbol_dict[data.symbol].push(attrs);
+									if(i> 0){
+											dropdown_dict.push(attrs);
+									}
+									
 						};
+
 						  var tpl = $('#tpl').html();
 							var html = template(tpl,{result: symbol_dict[data.symbol]});
-							// console.log('html',html)
 							$('.content table tbody').append(html);
-							console.log('false',filterFlag);
+							var drop_tpl = $('#dropdown').html();
+							var drop_html = template(drop_tpl,{result: dropdown_dict});
+							$('.content table tbody').append(drop_html);
 							if(filterFlag){
-									console.log('false',data.symbol);
 									$('.main-row[data-symbol='+data.symbol+']').hide();
 							}
 							change_bgcolor();
+				};
+				var data1234 ={
+						ofr:[
+							{
+								price:11232,
+								size:2222
+							},{
+								price:22222,
+								size:1111
+							}
+						],
+						bid:[
+							{
+								price:22234,
+								size:2222
+							},{
+								price:22222,
+								size:1111
+							}
+						],
+						symbol:'XUSSD',
+						digits:2
 				};
 				function set_websocket(){
 						var ws = $.websocket("ws://52.196.29.119/ws/bang_quote?source=risehills&target=book", {
 						    open: function() {
 						    		$('.h-connected img').prop('src','images/icon01.png');
+						    	render_symbolTable(data1234);
 						    },
 						    close: function() {},
 						    message: function(e){
-						    	console.log('webscoket',JSON.parse(e.originalEvent.data));
 						    	var data = JSON.parse(e.originalEvent.data);
-						    	render_symbolTable(data);
+						    	render_symbolTable(data1234);
 						    }
 						});
 				};
@@ -382,10 +429,8 @@
 									return;
 								}
 								filterFlag = true;
-								console.log('12345');
 								$('.main-row').each(function(){
 										var symbol =$(this).attr('data-symbol');
-										// console.log('symbol',symbol);
 										$('[data-symbol='+symbol+'] .icon-dropdown.downed').trigger('click');
 										$('[data-symbol='+symbol+'] .icon-chkbox.checked').trigger('click');
 										if($.inArray(symbol,symbol_list)==-1){
@@ -396,11 +441,12 @@
 								});
 				}
 				function fuzzy_search(){
-
-					$(document).keyup(function(){
-						if(_input.focus()){
+						var bind_name = 'input';  
+						if (navigator.userAgent.indexOf("MSIE") != -1) {  
+    						bind_name = 'propertychange';  
+						} 
+					$("#symbol_search").on('input',function(){
 							search_list_handle();
-						}		
 					});
 					search_btn.click(function(){
 								if(search_list.length == 0){
