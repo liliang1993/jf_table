@@ -389,33 +389,32 @@
 							}
 							change_bgcolor();
 				};
-				var data1234 ={
-						ofr:[
-							{
-								price:11232,
-								size:2222
-							},{
-								price:22222,
-								size:1111
-							}
-						],
-						bid:[
-							{
-								price:22234,
-								size:2222
-							},{
-								price:22222,
-								size:1111
-							}
-						],
-						symbol:'XUSSD',
-						digits:2
-				};
+				// var data1234 ={
+				// 		ofr:[
+				// 			{
+				// 				price:11232,
+				// 				size:2222
+				// 			},{
+				// 				price:22222,
+				// 				size:1111
+				// 			}
+				// 		],
+				// 		bid:[
+				// 			{
+				// 				price:22234,
+				// 				size:2222
+				// 			},{
+				// 				price:22222,
+				// 				size:1111
+				// 			}
+				// 		],
+				// 		symbol:'XUSSD',
+				// 		digits:2
+				// };
 				function set_websocket(){
 						var ws = $.websocket("ws://52.196.29.119/ws/bang_quote?source=risehills&target=book", {
 						    open: function() {
 						    		$('.h-connected img').prop('src','images/icon01.png');
-						    	render_symbolTable(data1234);
 						    },
 						    close: function() {},
 						    message: function(e){
