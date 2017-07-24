@@ -37,34 +37,31 @@
 													<span><%:=result[0].ofr_size%></span>
 											</td>
 										</tr>	
-											
-		</script>
-		<script id="dropdown" type="text/template">
-							<%for(var i = 0; i < result.length; i++) {%>
-											<tr class='dropdown-symbol dn' data-symbol=<%:=result[0][5]%> >
+										<%for(var i= 0; i <4; i++) {%>
+											<tr class='dropdown-symbol' data-exist='false' data-symbol=<%:=result[0].symbol%> >
 												<td width='20px' align='right'>							
 												</td>
 												<td width="70px" align='center' class='pr pl20'>
 												</td>
 												<td  align='center' class='w100 pl65'>
-														<span><%:=result[i][0]%></span>
+														<span class='dropdown_span'></span>
 												</td>
 												<td width='80px' align='right' >
-													<span><%:=result[i][1]%></span>
+													<span class='dropdown_span'></span>
 													<i class='icon-arrow'></i>
 												</td>
 												<td width='180px' align='center'>
-												<span><%:=result[i][2]%></span>		
+												<span class='dropdown_span'></span>		
 												</td>
 												<td width='60px' align='right' >
-														<span><%:=result[i][3]%></span>
+														<span class='dropdown_span'></span>
 														<i class='icon-arrow'></i>
 												</td>
 												<td width='140px' align='center'>
-														<span><%:=result[i][4]%></span>
+														<span class='dropdown_span'></span>
 												</td>
 											</tr>
-										<%}%>
+										<%}%>	
 		</script>
 		<script id="search" type="text/template">
 				<ul>
@@ -158,6 +155,7 @@
 				var search_btn = $('.icon-symbol-search');
 				var slide_lookSelected_btn = $('.lookSelected');
 				var slide_lookAll_btn = $('.lookAll');
+				var keys = ['bid_size','bid_price','spread','ofr_price','ofr_size'];
 				function table_checkbox_handle(){
 					$(document).on("click", "table .icon-chkbox", function(){
 							$(this).toggleClass('checked');
@@ -187,9 +185,9 @@
 									var attr = main_row.attr('data-symbol');
 									$(this).toggleClass('downed');
 									if($(this).hasClass('downed')){
-											$('.dropdown-symbol[data-symbol='+attr+']').show();
+											$('.dropdown-symbol[data-symbol='+attr+'][data-exist="true"]').show();
 									}else{
-										$('.dropdown-symbol[data-symbol='+attr+']').hide();
+										$('.dropdown-symbol[data-symbol='+attr+'][data-exist="true"]').hide();
 									}
 									
 				    })
@@ -223,12 +221,10 @@
 				function slide_bar_show(){
 							$('.slide-bar-l').click(function(){
 								var _content = $('.slide-bar-r');
-								var _width = _content.css('width');
-								console.log('_width',_width);	
+								var _width = _content.css('width');	
 								if(_width=='0px'){
 									_content.animate({width:'178px'});
 								}else if(_width >= '178px'){
-									console.log('_width',_width);	
 									_content.animate({width:'0px'});
 								}
 							})
@@ -269,12 +265,17 @@
 				function update_symbolTable(data){
 					var i,len1;
 					var dropdown_dict = []; 
+					var dropdown_symbol_trs = $('.drop-row[data-symbol='+data.symbol+']');
+					// var dropdown_symbol_spans =  $('.drop-row[data-symbol='+data.symbol+'] .dropdown_span')
 					var symbol_trs =  $('.main-row[data-symbol='+data.symbol+']');
 					var symbol_spans =  $('.main-row[data-symbol='+data.symbol+'] td span');
 						len = Math.min(data.ofr.length,data.bid.length);
+
 						if (len>=5){
 							len ==5;
 						}
+						$('.dropdown-symbol[data-symbol='+data.symbol+']').attr('data-exist','false');
+						$('.dropdown-symbol[data-symbol='+data.symbol+']').hide();
 						for(i = 0; i<len; i++){
 									var symbol = data.symbol;
 									var bid_size = data.bid[i].size;
@@ -283,17 +284,23 @@
 									var spread =(small_spread*Math.pow(10,data.digits)).toFixed(0);
 									var ofr_size = data.ofr[i].size;		
 									var ofr_price = data.ofr[i].price.toFixed(data.digits);
-									var attrs =[bid_size,bid_price,spread,ofr_price,ofr_size];
+									var attrs ={
+												symbol:symbol,
+												bid_size:bid_size,
+												bid_price:bid_price,
+												spread : spread,
+												ofr_price : ofr_price,
+												ofr_size : ofr_size
+									};
+									// var attrs = []
+									
 									if(i == 0){
 										var pre_bid_price =	symbol_dict[data.symbol][0].bid_price;
 										var pre_ofr_price =	symbol_dict[data.symbol][0].ofr_price;
-
-										// console.log('bid_price',bid_price);
-										attrs.forEach(function(item,index){												
-												symbol_spans.eq(1+index).text(item);
+										keys.forEach(function(item,index){												
+												symbol_spans.eq(1+index).text(attrs[item]);
 										});
 										if(pre_bid_price > bid_price){
-
 												$('[data-bid='+data.symbol+'] .icon-arrow').removeClass('up').addClass('down');
 										}else if(pre_bid_price < bid_price){
 												$('[data-bid='+data.symbol+'] .icon-arrow').removeClass('down').addClass('up');
@@ -303,46 +310,41 @@
 										}else if(pre_ofr_price < ofr_price){
 												$('[data-ofr='+data.symbol+'] .icon-arrow').removeClass('down').addClass('up');
 										}
-										symbol_dict[data.symbol][0] = {
-												symbol: symbol,
-												bid_size : bid_size,
-												bid_price: bid_price,
-												spread: spread,
-												ofr_price:ofr_price,
-												ofr_size: ofr_size
-										};
+										symbol_dict[data.symbol][0] = attrs
 									}else{
-											dropdown_dict.push([bid_size,bid_price,spread,ofr_price,ofr_size,symbol]);
+											var _index = i- 1;
+											var _dropdown_tr = $('.dropdown-symbol[data-symbol='+data.symbol+']').eq(_index);
+											keys.forEach(function(item,index){		
+											_dropdown_tr.find('.dropdown_span').eq(index).text(attrs[item]);
+										});
+										_dropdown_tr.attr('data-exist','true');
 									}
-						}
-									var tpl =$('#dropdown').html();
-									var html = template(tpl,{result: dropdown_dict});
-									$('.dropdown-symbol[data-symbol='+data.symbol+']').remove();
-									symbol_trs.after(html);
+						}			
 									if(symbol_trs.find('.icon-dropdown').hasClass('downed')){
 
-											$('.dropdown-symbol[data-symbol='+data.symbol+']').show();
+											$('.dropdown-symbol[data-symbol='+data.symbol+'][data-exist="true"]').show();
 									}else{
-										$('.dropdown-symbol[data-symbol='+data.symbol+']').hide();
+										$('.dropdown-symbol[data-symbol='+data.symbol+'][data-exist="true"]').hide();
 									} 
 				};
 				function first_render_symbol(data){
 						var i,len;
+						var  dropdown_dict = [];
+						var dropdown_symbol_trs =  $('.dropdown-symbol[data-symbol='+data.symbol+']');
 						len = Math.min(data.ofr.length,data.bid.length);
 						if (len>=5){
 							len ==5;
 						};
+
+						symbol_dict[data.symbol] = [];
 						for(i = 0;i<len;i++){
 									var symbol = data.symbol;
-									// console.log('symbol',data,i);
 									var bid_size = data.bid[i].size;
-									// console.log('bid_size',bid_size);
 									var bid_price = data.bid[i].price.toFixed(data.digits);
 									var small_spread = Math.abs(data.ofr[i].price - data.bid[i].price).toFixed(data.digits);
 									var spread = small_spread*Math.pow(10,data.digits);
 									var ofr_size = data.ofr[i].size;
 									var ofr_price = data.ofr[i].price.toFixed(data.digits);
-									symbol_dict[data.symbol] = [];
 									var attrs ={
 										symbol: symbol,
 										bid_size : bid_size,
@@ -351,28 +353,35 @@
 										ofr_price:ofr_price,
 										ofr_size: ofr_size
 									} 
-									symbol_dict[data.symbol].push(attrs);
+									if(i==0){
+										symbol_dict[data.symbol].push(attrs);
+										var tpl = $('#tpl').html();
+										var html = template(tpl,{result: symbol_dict[data.symbol]});
+										$('.content table tbody').append(html);
+									}else{
+											var _index = i- 1;
+											var _dropdown_tr = $('.dropdown-symbol[data-symbol='+data.symbol+']').eq(_index);
+											keys.forEach(function(item,index){		
+
+											_dropdown_tr.find('.dropdown_span').eq(index).text(attrs[item]);
+										});
+										_dropdown_tr.attr('data-exist','true');
+										_dropdown_tr.hide();
+									}
 						};
-						  var tpl = $('#tpl').html();
-							var html = template(tpl,{result: symbol_dict[data.symbol]});
-							// console.log('html',html)
-							$('.content table tbody').append(html);
-							console.log('false',filterFlag);
 							if(filterFlag){
-									console.log('false',data.symbol);
 									$('.main-row[data-symbol='+data.symbol+']').hide();
 							}
 							change_bgcolor();
 				};
 				function set_websocket(){
-						var ws = $.websocket("ws://52.196.29.119/ws/bang_quote?source=risehills&target=book", {
+						var ws = $.websocket("ws://52.193.249.89/ws/bang_quote?source=risehills&target=book", {
 						    open: function() {
 						    		$('.h-connected img').prop('src','images/icon01.png');
 						    },
 						    close: function() {},
 						    message: function(e){
-						    	console.log('webscoket',JSON.parse(e.originalEvent.data));
-						    	var data = JSON.parse(e.originalEvent.data);
+						    	var data = JSON.parse(e.originalEvent.data);									
 						    	render_symbolTable(data);
 						    }
 						});
@@ -382,10 +391,8 @@
 									return;
 								}
 								filterFlag = true;
-								console.log('12345');
 								$('.main-row').each(function(){
 										var symbol =$(this).attr('data-symbol');
-										// console.log('symbol',symbol);
 										$('[data-symbol='+symbol+'] .icon-dropdown.downed').trigger('click');
 										$('[data-symbol='+symbol+'] .icon-chkbox.checked').trigger('click');
 										if($.inArray(symbol,symbol_list)==-1){
@@ -396,11 +403,10 @@
 								});
 				}
 				function fuzzy_search(){
-
-					$(document).keyup(function(){
-						if(_input.focus()){
+					var bind_name="input";//定义所要绑定的事件名称
+    			if(navigator.userAgent.indexOf("MSIE")!=-1) bind_name="propertychange";//判断是否为IE内核 IE内核的事件名称要改为propertychange
+					$('.symbol-search').on(bind_name,function(){
 							search_list_handle();
-						}		
 					});
 					search_btn.click(function(){
 								if(search_list.length == 0){

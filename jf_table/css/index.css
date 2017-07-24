@@ -336,6 +336,14 @@ i.icon-arrow.down{
 	background: url('../images/ico.png'),no-repeat;
 	background-position:-28px -175px; 
 }
+
+.dropdown-symbol[data-exist="true"]{
+		display: table-row;
+}
+.dropdown-symbol[data-exist="false"]{
+		display: none;
+}
+
 .selected-list{
 	padding:0 33px;
 	height: 430px;
